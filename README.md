@@ -129,9 +129,8 @@ Takes a `GlobeRect` and returns the estimated **surface area of the region in sq
 
 Instead of treating the region as a flat rectangle, use the formula for computing the area of a region on a **sphere**:
 
-\[
-A = R^2 \cdot |\lambda_2 - \lambda_1| \cdot |\sin(\phi_2) - \sin(\phi_1)|
-\]
+`A = R^2 * |λ₂ - λ₁| * |sin(φ₂) - sin(φ₁)|`
+
 
 Where:
 - `R = 6378.1` (Earth’s radius in kilometers)
@@ -151,9 +150,8 @@ If your rectangle crosses from one side of the Earth to the other (e.g. west_lon
 
 Normally, to find how wide a region is in longitude, you subtract the west longitude from the east longitude:
 
-\[
-\Delta \lambda = \text{east\_long} - \text{west\_long}
-\]
+`A = R^2 * |λ₂ - λ₁| * |sin(φ₂) - sin(φ₁)|`
+
 
 This works most of the time.
 
@@ -162,7 +160,8 @@ But if your region crosses the 180° line — the line where longitude jumps fro
 For example:
 
 - A region goes from 170° east to -170° (which is the same as 190° east if you went around the Earth).
-- Subtracting: \(-170^\circ - 170^\circ = -340^\circ\), which doesn’t make sense for width.
+- Subtracting:`-170° - 170° = -340°`
+, which doesn’t make sense for width.
 
 So we fix it:  
 If the result is negative, it means we wrapped around the back side of the globe.  
