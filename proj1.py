@@ -1,8 +1,13 @@
 #complete your tasks in this file
-#I was here
+
+import sys
+import unittest
+import math
+from typing import *
+from dataclasses import dataclass
+sys.setrecursionlimit(10**6)
 
 #Task 1
-from dataclasses import dataclass
 @dataclass
 class GlobeRect(frozen=True):
     lo_lat: float
@@ -51,3 +56,33 @@ region_conditions = [RegionCondition(
                             , 'SLO', 'forest'),
                         2025, 130000, 1200000)
 ]
+
+#Task 3
+
+#subtask 3.1
+def emissions_per_capita(rc):
+    if rc.pop == 0:
+        return 0.0
+    return rc.ghg_rate / rc.pop
+
+#subtask 3.2
+def area(gr):
+    return (6378.1**2) * (abs(gr.east_long - gr.west_long)) * (abs(math.sin(gr.hi_lat) - math.sin(gr.lo_lat)))
+
+#subtask 3.3
+def emissions_per_square_km(rc):
+    return emissions_per_capita(rc) / area(rc.region.rect)
+
+#subtask 3.4
+def densest(rc_list):
+    def calculate_density(rc_list):
+        if len(rc_list) == 1:
+            return rc_list[0]
+        first = rc_list[0]
+        rest = densest(rc_list[1:])
+        if first.pop/area(first.region.rect) > rest.pop/area(rest.region.rect):
+            return first
+        else:
+            return rest
+    return calculate_density(rc_list).region.name
+
