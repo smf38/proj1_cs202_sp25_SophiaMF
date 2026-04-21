@@ -72,7 +72,11 @@ def emissions_per_capita(rc: RegionCondition)->float:
 
 #Return the surface area in square kilometers of the given geographic rectangle.
 def area(gr: GlobeRect)->float:
-    return (6378.1**2) * (abs(gr.east_long - gr.west_long)) * (abs(math.sin(gr.hi_lat) - math.sin(gr.lo_lat)))
+    lo_lat_rad = math.radians(gr.lo_lat)
+    hi_lat_rad = math.radians(gr.hi_lat)
+    west_long_rad = math.radians(gr.west_long)
+    east_long_rad = math.radians(gr.east_long)
+    return (6378.1 ** 2) * abs(east_long_rad - west_long_rad) * abs(math.sin(hi_lat_rad) - math.sin(lo_lat_rad))
 
 #subtask 3.3
 
@@ -84,7 +88,7 @@ def emissions_per_square_km(rc: RegionCondition)->float:
 
 #Return the name of the region with the highest population density from the list.
 def densest(rc_list: list[RegionCondition])->str:
-    def calculate_density(rc_list):
+    def calculate_density(rc_list: list[RegionCondition]) -> RegionCondition:
         if len(rc_list) == 1:
             return rc_list[0]
         first: RegionCondition = rc_list[0]
@@ -101,7 +105,7 @@ def densest(rc_list: list[RegionCondition])->str:
 #updating population and emissions based on terrain growth rates.
 def project_condition(rc: RegionCondition, years: int)->RegionCondition:
     # Return the annual population growth rate associated with the given terrain type.
-    def get_growth_rate(terrain):
+    def get_growth_rate(terrain: str) -> float:
         if terrain == "ocean":
             return 0.0001
         elif terrain == "mountains":
