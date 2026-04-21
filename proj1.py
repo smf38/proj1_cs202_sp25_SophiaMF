@@ -5,24 +5,25 @@ import unittest
 import math
 from typing import *
 from dataclasses import dataclass
+
 sys.setrecursionlimit(10**6)
 
 #Task 1
-@dataclass
-class GlobeRect(frozen=True):
+@dataclass(frozen=True)
+class GlobeRect:
     lo_lat: float
     hi_lat: float
     west_long: float
     east_long: float
 
-@dataclass
-class Region(frozen=True):
+@dataclass(frozen=True)
+class Region:
     rect: GlobeRect
     name: str
     terrain: str # ocean|mountains|forest|other
 
-@dataclass
-class RegionCondition(frozen=True):
+@dataclass(frozen=True)
+class RegionCondition:
     region: Region
     year: int
     pop: int
@@ -61,7 +62,7 @@ region_conditions = [RegionCondition(
 
 #subtask 3.1
 def emissions_per_capita(rc):
-    if rc.pop == 0:
+    if rc.pop == 0 or rc.pop < 0.0:
         return 0.0
     return rc.ghg_rate / rc.pop
 
@@ -71,7 +72,7 @@ def area(gr):
 
 #subtask 3.3
 def emissions_per_square_km(rc):
-    return emissions_per_capita(rc) / area(rc.region.rect)
+    return rc.ghg_rate / area(rc.region.rect)
 
 #subtask 3.4
 def densest(rc_list):
@@ -79,7 +80,7 @@ def densest(rc_list):
         if len(rc_list) == 1:
             return rc_list[0]
         first = rc_list[0]
-        rest = densest(rc_list[1:])
+        rest = calculate_density(rc_list[1:])
         if first.pop/area(first.region.rect) > rest.pop/area(rest.region.rect):
             return first
         else:
