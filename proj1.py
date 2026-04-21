@@ -61,29 +61,71 @@ region_conditions = [RegionCondition(
 #Task 3
 
 #subtask 3.1
-def emissions_per_capita(rc):
+
+#Return the greenhouse gas emissions per person for the given region condition.
+def emissions_per_capita(rc: RegionCondition)->float:
     if rc.pop == 0 or rc.pop < 0.0:
         return 0.0
     return rc.ghg_rate / rc.pop
 
 #subtask 3.2
-def area(gr):
+
+#Return the surface area in square kilometers of the given geographic rectangle.
+def area(gr: GlobeRect)->float:
     return (6378.1**2) * (abs(gr.east_long - gr.west_long)) * (abs(math.sin(gr.hi_lat) - math.sin(gr.lo_lat)))
 
 #subtask 3.3
-def emissions_per_square_km(rc):
+
+#Return the greenhouse gas emissions per square kilometer for the given region condition.
+def emissions_per_square_km(rc: RegionCondition)->float:
     return rc.ghg_rate / area(rc.region.rect)
 
 #subtask 3.4
-def densest(rc_list):
+
+#Return the name of the region with the highest population density from the list.
+def densest(rc_list: list[RegionCondition])->str:
     def calculate_density(rc_list):
         if len(rc_list) == 1:
             return rc_list[0]
-        first = rc_list[0]
-        rest = calculate_density(rc_list[1:])
+        first: RegionCondition = rc_list[0]
+        rest: RegionCondition = calculate_density(rc_list[1:])
         if first.pop/area(first.region.rect) > rest.pop/area(rest.region.rect):
             return first
         else:
             return rest
     return calculate_density(rc_list).region.name
+
+#Task 4
+
+#Return a new RegionCondition projected forward by the given number of years,
+#updating population and emissions based on terrain growth rates.
+def project_condition(rc: RegionCondition, years: int)->RegionCondition:
+    # Return the annual population growth rate associated with the given terrain type.
+    def get_growth_rate(terrain):
+        if terrain == "ocean":
+            return 0.0001
+        elif terrain == "mountains":
+            return 0.0005
+        elif terrain == "forest":
+            return -0.00001
+        return 0.0003
+
+    #Return the population after applying compound growth for the given number of years.
+    def grow_population(pop: int, pop_rate: float, years: int) -> float:
+        if years == 0:
+            return pop
+        else:
+            return grow_population(pop * (1 + pop_rate), pop_rate, years - 1)
+
+    rate: float = get_growth_rate(rc.region.terrain)
+    new_pop_float = grow_population(rc.pop, rate, years)
+    new_population = int(new_pop_float)
+
+    if rc.pop == 0:
+        new_ghg: float = 0.0
+    else:
+        new_ghg: float = rc.ghg_rate * (new_pop_float / rc.pop)
+
+    return RegionCondition(rc.region, rc.year + years,
+                           int(new_population), new_ghg)
 
